@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}IFMIS Admin{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="theme-staff">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header" role="banner">
+  <div class="shell site-header__row">
+    <a href="/staff/dashboard/" class="brand" aria-label="IFMIS Admin Dashboard">
+      <span class="brand__mark" aria-hidden="true">IF</span>
+      <span class="brand__meta">
+        <small>Secure Staff Portal</small>
+        <strong>IFMIS Admin Portal</strong>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Admin">
+      <a href="/staff/dashboard/" class="site-nav__link {% if request.path == '/staff/dashboard/' %}is-active{% endif %}" {% if request.path == '/staff/dashboard/' %}aria-current="page"{% endif %}>Dashboard</a>
+      <a href="/staff/audit/" class="site-nav__link {% if request.path == '/staff/audit/' %}is-active{% endif %}" {% if request.path == '/staff/audit/' %}aria-current="page"{% endif %}>Audit Log</a>
+      <form class="logout-form" method="post" action="/staff/logout/">
+        {% csrf_token %}
+        <button class="btn-logout" type="submit">Sign Out</button>
+      </form>
+    </nav>
+  </div>
+</header>
+
+{% block hero %}{% endblock %}
+
+<main id="main-content" class="shell main-content page-enter" tabindex="-1">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="shell site-footer">Internal IFMIS Help Desk Interface</footer>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

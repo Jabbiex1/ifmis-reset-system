@@ -1,0 +1,33 @@
+{% extends 'base_staff.html' %}
+
+{% block title %}IFMIS Admin | Confirm Delete{% endblock %}
+
+{% block hero %}
+<section class="shell hero-wrap">
+  <div class="hero-block" style="background:linear-gradient(130deg,var(--danger),#811c13)">
+    <h1 class="hero-block__title">Delete request</h1>
+    <p class="hero-block__lead">This operation permanently removes the request, messages, and uploaded file.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="panel danger-card" aria-labelledby="delete-request-title">
+  <div class="section">
+    <h2 id="delete-request-title" class="section-title">Confirm permanent deletion</h2>
+    <div class="card-row"><div class="card-key">Reference</div><div class="card-value"><span class="code-pill">{{ req.reference_code }}</span></div></div>
+    <div class="card-row"><div class="card-key">Full Name</div><div class="card-value">{{ req.full_name }}</div></div>
+    <div class="card-row"><div class="card-key">Department</div><div class="card-value">{{ req.department }}</div></div>
+    <div class="card-row"><div class="card-key">Email</div><div class="card-value">{{ req.email }}</div></div>
+    <div class="card-row"><div class="card-key">Submitted</div><div class="card-value">{{ req.submitted_at|date:"d M Y, H:i" }}</div></div>
+    <div class="warn-box" role="alert">This action cannot be undone. The deletion will be logged in the audit trail.</div>
+    <div class="action-row" style="justify-content:flex-end;margin-top:14px">
+      <a class="btn btn--ghost" href="/staff/dashboard/">Cancel</a>
+      <form method="post" action="{% url 'delete_request' req.pk %}" style="margin:0">
+        {% csrf_token %}
+        <button class="btn btn--danger" type="submit">Delete Permanently</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

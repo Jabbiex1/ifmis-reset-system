@@ -1,278 +1,104 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Track Request — IFMIS Help Desk</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#0f1f3d;--navy-mid:#1a3260;--navy-light:#2a4a8a;--navy-pale:#eef2fa;
-  --accent:#3b82f6;--accent-dark:#2563eb;
-  --white:#ffffff;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
-  --gray-400:#94a3b8;--gray-600:#475569;--gray-800:#1e293b;
-  --success:#16a34a;--radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
-}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;display:flex;flex-direction:column;font-size:15px}
+{% extends 'base_public.html' %}
 
-.header{background:var(--navy);padding:0 24px}
-.header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.crest{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.header-text .org{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px}
-.header-text .title{font-size:1rem;font-weight:700;color:#fff}
-.header-nav{margin-left:auto;display:flex;gap:4px}
-.header-nav a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.8rem;font-weight:500;padding:6px 12px;border-radius:6px;transition:.15s}
-.header-nav a:hover{background:rgba(255,255,255,.08);color:#fff}
-.header-nav a.active{background:rgba(59,130,246,.25);color:#93c5fd}
+{% block title %}IFMIS Help Desk | Track Request{% endblock %}
 
-main{flex:1;max-width:1100px;margin:0 auto;width:100%;padding:32px 24px 60px}
-
-.page-hero{margin-bottom:24px}
-.page-hero h1{font-size:1.5rem;font-weight:700;color:var(--navy)}
-.page-hero p{font-size:.9rem;color:var(--gray-600);margin-top:6px}
-
-/* LOOKUP */
-.lookup-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px}
-.lookup-card h2{font-size:.95rem;font-weight:700;color:var(--navy);margin-bottom:4px}
-.lookup-card p{font-size:.82rem;color:var(--gray-400);margin-bottom:16px}
-.lookup-form{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
-.lookup-form .field{flex:1;min-width:200px}
-.lookup-form label{display:block;font-size:.8rem;font-weight:600;color:var(--gray-600);margin-bottom:6px}
-.lookup-form input{width:100%;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.95rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--navy);background:var(--gray-50);outline:none;transition:.15s}
-.lookup-form input:focus{border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-.lookup-form input::placeholder{letter-spacing:1px;font-weight:400;color:var(--gray-400);font-size:.85rem}
-.btn-lookup{padding:11px 24px;background:var(--navy);color:#fff;border:none;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap}
-.btn-lookup:hover{background:var(--navy-mid)}
-.error-box{background:#fef2f2;border:1px solid #fecaca;border-left:3px solid #dc2626;border-radius:6px;padding:12px 14px;font-size:.82rem;color:#dc2626;margin-top:14px}
-
-/* RESULT LAYOUT */
-.result-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start;animation:fadeUp .3s ease both}
-
-/* INFO CARD */
-.info-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.info-card-head{padding:12px 16px;background:var(--navy);color:#fff;font-size:.8rem;font-weight:600}
-.info-card-body{padding:16px}
-.info-row{display:flex;flex-direction:column;gap:12px}
-.info-item{}
-.info-label{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px}
-.info-value{font-size:.88rem;color:var(--gray-800);font-weight:500}
-.divider{height:1px;background:var(--gray-100)}
-
-.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.badge-dot{width:6px;height:6px;border-radius:50%}
-.badge.pending{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
-.badge.pending .badge-dot{background:#f59e0b}
-.badge.processed{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
-.badge.processed .badge-dot{background:#22c55e}
-.ref-chip{font-family:'Courier New',monospace;font-size:.82rem;font-weight:700;letter-spacing:2px;color:var(--navy);background:var(--navy-pale);padding:3px 10px;border-radius:4px;border:1px solid rgba(59,130,246,.2)}
-
-/* CHAT */
-.chat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
-.chat-head{background:var(--navy);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.chat-head h3{font-size:.9rem;font-weight:700;color:#fff}
-.chat-head .count{font-size:.75rem;color:rgba(255,255,255,.4)}
-.chat-body{padding:20px;display:flex;flex-direction:column;gap:14px;min-height:260px;max-height:380px;overflow-y:auto}
-.chat-body::-webkit-scrollbar{width:4px}
-.chat-body::-webkit-scrollbar-track{background:var(--gray-50)}
-.chat-body::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:2px}
-.chat-empty{text-align:center;color:var(--gray-400);font-size:.84rem;padding:40px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
-.chat-empty .ei{font-size:2rem;opacity:.3}
-
-.msg{display:flex;flex-direction:column}
-.msg.user{align-items:flex-start}
-.msg.admin{align-items:flex-end}
-.msg-meta{font-size:.68rem;color:var(--gray-400);margin-bottom:4px;display:flex;align-items:center;gap:5px}
-.msg.admin .msg-meta{flex-direction:row-reverse}
-.msg-who{font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}
-.msg.user .msg-who{color:var(--gray-600)}
-.msg.admin .msg-who{color:var(--accent)}
-.bubble{max-width:76%;padding:10px 14px;font-size:.86rem;line-height:1.6;word-break:break-word;border-radius:4px}
-.msg.user .bubble{background:var(--gray-100);border:1px solid var(--gray-200);border-radius:4px 12px 12px 4px}
-.msg.admin .bubble{background:var(--navy);color:#fff;border-radius:12px 4px 4px 12px}
-
-.chat-reply{border-top:1px solid var(--gray-100);padding:16px 20px;background:var(--gray-50)}
-.chat-reply .reply-label{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:8px}
-.chat-reply textarea{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--gray-800);background:#fff;resize:vertical;min-height:72px;outline:none;transition:.15s}
-.chat-reply textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-.reply-footer{display:flex;justify-content:flex-end;margin-top:8px}
-.btn-send{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:.15s}
-.btn-send:hover{background:var(--accent-dark)}
-.processed-note{background:#f0fdf4;border:1px solid #bbf7d0;border-left:3px solid #22c55e;border-radius:6px;padding:12px 16px;margin:12px 20px;font-size:.82rem;color:#166534}
-
-footer{background:var(--navy);color:rgba(255,255,255,.4);font-size:.74rem;text-align:center;padding:16px 24px}
-footer a{color:rgba(255,255,255,.5);text-decoration:none}
-footer a:hover{color:#fff}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-@media(max-width:768px){
-  .result-grid{grid-template-columns:1fr}
-  .chat-body{max-height:300px}
-}
-@media(max-width:480px){
-  main{padding:20px 16px 48px}
-  .header-nav{display:none}
-  .lookup-form{flex-direction:column}
-  .btn-lookup{width:100%}
-}
-</style>
-</head>
-<body>
-
-<div class="header">
-  <div class="header-inner">
-    <div class="crest">🇸🇱</div>
-    <div class="header-text">
-      <div class="org">Ministry of Finance · Sierra Leone</div>
-      <div class="title">IFMIS Help Desk Portal</div>
-    </div>
-    <nav class="header-nav">
-      <a href="/">Submit Request</a>
-      <a href="/track/" class="active">Track Request</a>
-      <a href="/staff/login/">Staff Login</a>
-    </nav>
+{% block hero %}
+<section class="shell hero-wrap">
+  <div class="hero-block">
+    <h1 class="hero-block__title">Track your request status</h1>
+    <p class="hero-block__lead">Enter your 12-character reference code to view status updates and communicate with the help desk.</p>
   </div>
-</div>
+</section>
+{% endblock %}
 
-<main>
-
-<div class="page-hero">
-  <h1>Track Your Request</h1>
-  <p>Enter your reference code to view the status of your request and communicate with the Help Desk.</p>
-</div>
-
-<!-- Lookup -->
-<div class="lookup-card">
-  <h2>Enter Reference Code</h2>
-  <p>Your reference code was displayed after you submitted your request</p>
-  <form method="get" action="/track/" class="lookup-form">
-    <div class="field">
+{% block content %}
+<section class="panel section" aria-labelledby="lookup-title">
+  <h2 id="lookup-title" class="section-title">Find request</h2>
+  <form method="get" action="/track/" class="action-row" aria-label="Reference lookup">
+    <div style="flex:1 1 300px">
       <label for="ref">Reference Code</label>
-      <input type="text" id="ref" name="ref" value="{{ ref_code }}" placeholder="e.g. ABC123XYZ789" maxlength="12" autocomplete="off" required/>
+      <input id="ref" class="control" name="ref" type="text" maxlength="12" value="{{ ref_code }}" placeholder="ABC123XYZ789" required autocomplete="off" style="font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase">
     </div>
-    <button type="submit" class="btn-lookup">Find Request →</button>
+    <button class="btn btn--primary" type="submit">Find Request</button>
   </form>
-  {% if error %}
-  <div class="error-box">⚠ {{ error }}</div>
-  {% endif %}
-</div>
+  {% if error %}<div class="flash flash--error" role="alert" style="margin-top:12px">{{ error }}</div>{% endif %}
+</section>
 
-<!-- Result -->
 {% if request_obj %}
-<div class="result-grid">
-
-  <!-- Info -->
-  <div>
-    <div class="info-card">
-      <div class="info-card-head">Request Details</div>
-      <div class="info-card-body">
-        <div class="info-row">
-
-          <div class="info-item">
-            <div class="info-label">Status</div>
-            <div class="info-value">
-              {% if request_obj.processed %}
-                <span class="badge processed"><span class="badge-dot"></span>Processed</span>
-              {% else %}
-                <span class="badge pending"><span class="badge-dot"></span>Pending Review</span>
-              {% endif %}
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="info-item">
-            <div class="info-label">Reference</div>
-            <div class="info-value"><span class="ref-chip">{{ request_obj.reference_code }}</span></div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="info-item">
-            <div class="info-label">Full Name</div>
-            <div class="info-value">{{ request_obj.full_name }}</div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="info-item">
-            <div class="info-label">Department</div>
-            <div class="info-value">{{ request_obj.department }}</div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="info-item">
-            <div class="info-label">Submitted</div>
-            <div class="info-value">{{ request_obj.submitted_at|date:"d M Y, H:i" }}</div>
-          </div>
-
-        </div>
+<section class="lookup-grid">
+  <article class="panel section" aria-label="Request details">
+    <div class="card-row">
+      <div class="card-key">Status</div>
+      <div class="card-value">
+        {% if request_obj.processed %}
+          <span class="badge badge--done">Processed</span>
+        {% else %}
+          <span class="badge badge--pending">Pending Review</span>
+        {% endif %}
       </div>
     </div>
-  </div>
+    <div class="card-row"><div class="card-key">Reference</div><div class="card-value"><span class="code-pill">{{ request_obj.reference_code }}</span></div></div>
+    <div class="card-row"><div class="card-key">Full Name</div><div class="card-value">{{ request_obj.full_name }}</div></div>
+    <div class="card-row"><div class="card-key">Department</div><div class="card-value">{{ request_obj.department }}</div></div>
+    <div class="card-row"><div class="card-key">Submitted</div><div class="card-value">{{ request_obj.submitted_at|date:"d M Y, H:i" }}</div></div>
+  </article>
 
-  <!-- Chat -->
-  <div>
-    <div class="chat-card">
-      <div class="chat-head">
-        <h3>💬 Messages</h3>
-        <span class="count">{{ chat_messages|length }} message{{ chat_messages|length|pluralize }}</span>
-      </div>
+  <article class="panel chat-shell" aria-label="Conversation">
+    <div class="chat-head">
+      <strong>Conversation</strong>
+      <span class="muted">{{ chat_messages|length }} message{{ chat_messages|length|pluralize }}</span>
+    </div>
 
-      <div class="chat-body" id="chatBox">
-        {% for msg in chat_messages %}
-        <div class="msg {{ msg.sender }}">
-          <div class="msg-meta">
-            <span class="msg-who">{% if msg.sender == 'admin' %}Help Desk{% else %}You{% endif %}</span>
-            <span>·</span>
-            <span>{{ msg.timestamp|date:"d M, H:i" }}</span>
-          </div>
-          <div class="bubble">{{ msg.content }}</div>
+    <div class="chat-body" id="chatBox">
+      {% for msg in chat_messages %}
+        <div class="chat-msg {% if msg.sender == 'admin' %}chat-msg--admin{% else %}chat-msg--user{% endif %}">
+          <div class="chat-meta">{% if msg.sender == 'admin' %}Help Desk{% else %}You{% endif %} | {{ msg.timestamp|date:"d M, H:i" }}</div>
+          <div class="chat-bubble">{{ msg.content }}</div>
         </div>
-        {% empty %}
-        <div class="chat-empty">
-          <div class="ei">💬</div>
-          <div>No messages yet</div>
-          <div style="font-size:.76rem">Send a message below if you have questions</div>
-        </div>
-        {% endfor %}
-      </div>
+      {% empty %}
+        <div class="chat-empty">No messages yet.</div>
+      {% endfor %}
+    </div>
 
-      {% if request_obj.processed %}
-      <div class="processed-note">✅ Your request has been processed. Submit a new request if you need further help.</div>
-      {% else %}
+    {% if request_obj.processed %}
+      <div class="done-note">This request is processed. Submit a new request if needed.</div>
+    {% else %}
       <div class="chat-reply">
-        <div class="reply-label">Send a Message</div>
-        <form method="post" action="/track/">
+        <form method="post" action="/track/" aria-label="Send message to help desk">
           {% csrf_token %}
           <input type="hidden" name="ref_code" value="{{ request_obj.reference_code }}"/>
-          <textarea name="content" placeholder="Type your message to the Help Desk..." required></textarea>
-          <div class="reply-footer">
-            <button type="submit" class="btn-send">Send →</button>
+          <label for="track-content" class="card-key" style="display:block;margin-bottom:6px">Your Message</label>
+          <textarea id="track-content" class="control" name="content" placeholder="Write a message to Help Desk" required></textarea>
+          <div class="action-row" style="margin-top:8px;justify-content:flex-end">
+            <button class="btn btn--primary" type="submit">Send Message</button>
           </div>
         </form>
       </div>
-      {% endif %}
-
-    </div>
-  </div>
-
-</div>
+    {% endif %}
+  </article>
+</section>
 {% endif %}
+{% endblock %}
 
-</main>
-
-<footer>
-  © 2026 Ministry of Finance, Republic of Sierra Leone &nbsp;·&nbsp;
-  <a href="/">Submit a Request</a>
-</footer>
-
+{% block extra_js %}
 <script>
-const b = document.getElementById('chatBox');
-if(b) b.scrollTop = b.scrollHeight;
+const chatBox = document.getElementById('chatBox');
+if (chatBox) {
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+const STORAGE_KEY = 'ifmis_last_ref';
+const refInput = document.getElementById('ref');
+if (refInput && !refInput.value) {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    refInput.value = saved;
+  }
+}
+const params = new URLSearchParams(window.location.search);
+const refFromUrl = params.get('ref');
+if (refFromUrl) {
+  localStorage.setItem(STORAGE_KEY, refFromUrl.toUpperCase());
+}
 </script>
-</body>
-</html>
+{% endblock %}

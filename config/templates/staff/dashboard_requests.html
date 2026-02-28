@@ -1,238 +1,241 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Dashboard — IFMIS Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#0f1f3d;--navy-mid:#1a3260;--navy-light:#2a4a8a;--navy-pale:#eef2fa;
-  --accent:#3b82f6;--accent-dark:#2563eb;
-  --white:#ffffff;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
-  --gray-400:#94a3b8;--gray-600:#475569;--gray-800:#1e293b;
-  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
-}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;display:flex;flex-direction:column;font-size:15px}
+{% extends 'base_staff.html' %}
 
-.header{background:var(--navy);padding:0 24px}
-.header-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.crest{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.header-text .org{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px}
-.header-text .title{font-size:1rem;font-weight:700;color:#fff}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.admin-pill{background:rgba(59,130,246,.2);color:#93c5fd;font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:20px;letter-spacing:.04em}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;font-weight:500;padding:6px 14px;border-radius:6px;cursor:pointer;text-decoration:none;transition:.15s}
-.btn-logout:hover{background:rgba(255,255,255,.08);color:#fff}
+{% block title %}IFMIS Admin | Requests{% endblock %}
 
-nav{background:var(--navy-mid);padding:0 24px}
-.nav-inner{max-width:1280px;margin:0 auto;display:flex}
-nav a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.82rem;font-weight:500;padding:10px 16px;border-bottom:2px solid transparent;transition:.15s}
-nav a:hover{color:#fff}
-nav a.active{color:#fff;border-bottom-color:var(--accent)}
-
-main{flex:1;max-width:1280px;margin:0 auto;width:100%;padding:28px 24px 60px}
-
-.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
-.page-header h1{font-size:1.4rem;font-weight:700;color:var(--navy)}
-.page-header p{font-size:.84rem;color:var(--gray-400);margin-top:3px}
-
-/* Flash */
-.flash{background:#fff;border:1px solid var(--gray-200);border-left:3px solid var(--accent);border-radius:6px;padding:11px 16px;font-size:.84rem;color:var(--navy);margin-bottom:20px}
-
-/* STATS */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
-.stat{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px}
-.stat-icon{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
-.stat-icon.t{background:var(--navy-pale)}
-.stat-icon.p{background:#fffbeb}
-.stat-icon.d{background:#f0fdf4}
-.stat-num{font-size:1.7rem;font-weight:700;color:var(--navy);line-height:1}
-.stat-label{font-size:.72rem;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
-
-/* TABLE CARD */
-.table-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.table-head{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-100);gap:14px;flex-wrap:wrap}
-.table-head h2{font-size:.92rem;font-weight:700;color:var(--navy)}
-.filter-tabs{display:flex;gap:6px}
-.ftab{background:var(--gray-100);border:1px solid var(--gray-200);color:var(--gray-600);font-family:'Plus Jakarta Sans',sans-serif;font-size:.76rem;font-weight:600;padding:5px 14px;border-radius:20px;cursor:pointer;transition:.15s}
-.ftab:hover{background:var(--gray-200)}
-.ftab.active{background:var(--navy);border-color:var(--navy);color:#fff}
-
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;font-size:.84rem}
-thead tr{background:var(--gray-50);border-bottom:1px solid var(--gray-200)}
-thead th{padding:11px 16px;text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-400);white-space:nowrap}
-tbody tr{border-bottom:1px solid var(--gray-100);transition:.12s}
-tbody tr:last-child{border-bottom:none}
-tbody tr:hover{background:#fafcff}
-tbody td{padding:12px 16px;vertical-align:middle}
-td.dim{color:var(--gray-400);font-size:.8rem}
-.ref{font-family:'Courier New',monospace;font-size:.78rem;font-weight:700;letter-spacing:1.5px;color:var(--navy);background:var(--navy-pale);padding:3px 8px;border-radius:4px;border:1px solid rgba(59,130,246,.15);white-space:nowrap}
-.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.badge-dot{width:5px;height:5px;border-radius:50%}
-.badge.pending{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
-.badge.pending .badge-dot{background:#f59e0b}
-.badge.processed{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
-.badge.processed .badge-dot{background:#22c55e}
-.actions{display:flex;gap:6px;align-items:center}
-.btn-view{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:transparent;border:1.5px solid var(--gray-200);color:var(--gray-600);border-radius:5px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.76rem;font-weight:600;text-decoration:none;transition:.15s;white-space:nowrap}
-.btn-view:hover{background:var(--navy-pale);border-color:var(--accent);color:var(--navy)}
-.btn-process{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--accent);border:1.5px solid var(--accent);color:#fff;border-radius:5px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.76rem;font-weight:600;text-decoration:none;transition:.15s;white-space:nowrap}
-.btn-process:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
-.empty-state{text-align:center;padding:50px 20px;color:var(--gray-400)}
-.empty-state .ei{font-size:2.2rem;opacity:.3;display:block;margin-bottom:10px}
-
-footer{background:var(--navy);color:rgba(255,255,255,.35);font-size:.72rem;text-align:center;padding:14px}
-
-@media(max-width:900px){main{padding:20px 16px 48px}.stats{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){
-  .stats{grid-template-columns:1fr}
-  thead th:nth-child(4),tbody td:nth-child(4),thead th:nth-child(5),tbody td:nth-child(5){display:none}
-  .header-right .admin-pill{display:none}
-}
-</style>
-</head>
-<body>
-
-<div class="header">
-  <div class="header-inner">
-    <div class="crest">🇸🇱</div>
-    <div class="header-text">
-      <div class="org">Ministry of Finance · Sierra Leone</div>
-      <div class="title">IFMIS Help Desk — Admin Portal</div>
-    </div>
-    <div class="header-right">
-      <span class="admin-pill">IFMIS Admin</span>
-      <a href="/staff/logout/" class="btn-logout">Sign Out</a>
-    </div>
+{% block hero %}
+<section class="shell hero-wrap">
+  <div class="hero-block">
+    <h1 class="hero-block__title">Requests Dashboard</h1>
+    <p class="hero-block__lead">Review, process, and manage IFMIS password reset requests with fast filtering and safer bulk actions.</p>
   </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<div class="flash-stack" aria-live="polite">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="flash" role="status">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
 </div>
 
-<nav>
-  <div class="nav-inner">
-    <a href="/staff/dashboard/" class="active">Dashboard</a>
-    <a href="/">Public Portal</a>
-  </div>
-</nav>
+<section class="kpis" aria-label="Request statistics">
+  <article class="kpi"><div class="kpi__number" id="sTotal">{{ total_count }}</div><div class="kpi__label">Total Requests</div></article>
+  <article class="kpi"><div class="kpi__number" id="sPending">0</div><div class="kpi__label">Pending</div></article>
+  <article class="kpi"><div class="kpi__number" id="sDone">0</div><div class="kpi__label">Processed</div></article>
+</section>
 
-<main>
+<section class="panel" style="margin-bottom:12px">
+  <div class="toolbar">
+    <form method="get" action="/staff/dashboard/" class="filters-grid" aria-label="Filter requests">
+      <div>
+        <label class="label-small" for="q">Search</label>
+        <input id="q" class="control" type="text" name="q" value="{{ search }}" placeholder="Name, department, email, reference">
+      </div>
+      <div>
+        <label class="label-small" for="day">Day</label>
+        <input id="day" class="control" type="number" name="day" min="1" max="31" value="{{ day }}">
+      </div>
+      <div>
+        <label class="label-small" for="month">Month</label>
+        <select id="month" class="control" name="month">
+          <option value="">Any</option>
+          <option value="1" {% if month == "1" %}selected{% endif %}>January</option>
+          <option value="2" {% if month == "2" %}selected{% endif %}>February</option>
+          <option value="3" {% if month == "3" %}selected{% endif %}>March</option>
+          <option value="4" {% if month == "4" %}selected{% endif %}>April</option>
+          <option value="5" {% if month == "5" %}selected{% endif %}>May</option>
+          <option value="6" {% if month == "6" %}selected{% endif %}>June</option>
+          <option value="7" {% if month == "7" %}selected{% endif %}>July</option>
+          <option value="8" {% if month == "8" %}selected{% endif %}>August</option>
+          <option value="9" {% if month == "9" %}selected{% endif %}>September</option>
+          <option value="10" {% if month == "10" %}selected{% endif %}>October</option>
+          <option value="11" {% if month == "11" %}selected{% endif %}>November</option>
+          <option value="12" {% if month == "12" %}selected{% endif %}>December</option>
+        </select>
+      </div>
+      <div>
+        <label class="label-small" for="year">Year</label>
+        <input id="year" class="control" type="number" name="year" min="2020" max="2099" value="{{ year }}">
+      </div>
+      <button class="btn btn--primary" type="submit">Apply</button>
+    </form>
 
-{% if messages %}
-  {% for message in messages %}
-  <div class="flash">✅ {{ message }}</div>
-  {% endfor %}
-{% endif %}
+    {% if search or day or month or year %}
+      <div class="filter-meta">Filters active. <a href="/staff/dashboard/">Clear all</a></div>
+    {% endif %}
+  </div>
+</section>
 
-<div class="page-header">
-  <div>
-    <h1>Requests Dashboard</h1>
-    <p>All IFMIS password reset requests</p>
-  </div>
-</div>
-
-<!-- Stats -->
-<div class="stats">
-  <div class="stat">
-    <div class="stat-icon t">📋</div>
-    <div><div class="stat-num" id="sTotal">—</div><div class="stat-label">Total</div></div>
-  </div>
-  <div class="stat">
-    <div class="stat-icon p">⏳</div>
-    <div><div class="stat-num" id="sPending">—</div><div class="stat-label">Pending</div></div>
-  </div>
-  <div class="stat">
-    <div class="stat-icon d">✅</div>
-    <div><div class="stat-num" id="sDone">—</div><div class="stat-label">Processed</div></div>
-  </div>
-</div>
-
-<!-- Table -->
-<div class="table-card">
-  <div class="table-head">
-    <h2>All Reset Requests</h2>
-    <div class="filter-tabs">
-      <button class="ftab active" onclick="filter('all',this)">All</button>
-      <button class="ftab" onclick="filter('pending',this)">Pending</button>
-      <button class="ftab" onclick="filter('processed',this)">Processed</button>
+<section class="panel">
+  <div class="toolbar" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)">
+    <div class="status-tabs" role="tablist" aria-label="Request status views">
+      <button class="is-active" type="button" role="tab" aria-selected="true" onclick="filterRows('all',this)">All</button>
+      <button type="button" role="tab" aria-selected="false" onclick="filterRows('pending',this)">Pending</button>
+      <button type="button" role="tab" aria-selected="false" onclick="filterRows('processed',this)">Processed</button>
     </div>
+
+    <form method="post" action="/staff/bulk-delete/" id="bulkForm" style="margin:0">
+      {% csrf_token %}
+      <div class="bulk-bar" id="bulkBar" aria-live="polite">
+        <strong id="bulkCount">0 selected</strong>
+        <button class="btn btn--danger" type="submit" onclick="return confirmBulk()">Delete Selected</button>
+        <button class="btn btn--ghost" type="button" onclick="clearSelection()">Cancel</button>
+      </div>
+    </form>
   </div>
-  <div class="table-wrap">
-    <table id="tbl">
+
+  <div class="table-shell">
+    <table class="data-table" id="tbl">
       <thead>
         <tr>
-          <th>#</th>
-          <th>Reference</th>
-          <th>Full Name</th>
-          <th>Department</th>
-          <th>Email</th>
-          <th>Document</th>
-          <th>Submitted</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th scope="col"><input id="selectAll" type="checkbox" title="Select all visible"></th>
+          <th scope="col">#</th>
+          <th scope="col">Reference</th>
+          <th scope="col">Full Name</th>
+          <th scope="col">Department</th>
+          <th scope="col">Email</th>
+          <th scope="col">Document</th>
+          <th scope="col">Submitted</th>
+          <th scope="col">Days Open</th>
+          <th scope="col">Status</th>
+          <th scope="col">Actions</th>
         </tr>
       </thead>
       <tbody>
         {% for req in requests %}
-        <tr data-s="{% if req.processed %}processed{% else %}pending{% endif %}">
-          <td class="dim">{{ forloop.counter }}</td>
-          <td><span class="ref">{{ req.reference_code }}</span></td>
-          <td><strong>{{ req.full_name }}</strong></td>
-          <td class="dim">{{ req.department }}</td>
-          <td class="dim">{{ req.email }}</td>
-          <td>
-            {% if req.uploaded_file %}
-              <a href="{{ req.uploaded_file.url }}" target="_blank" style="color:var(--accent);font-size:.8rem;font-weight:600;text-decoration:none">📄 View</a>
-            {% else %}<span class="dim">—</span>{% endif %}
-          </td>
-          <td class="dim">{{ req.submitted_at|date:"d M Y" }}<br><span style="font-size:.72rem">{{ req.submitted_at|date:"H:i" }}</span></td>
-          <td>
+        <tr data-status="{% if req.processed %}processed{% else %}pending{% endif %}">
+          <td data-label="Select" class="table-cell-no-label"><input form="bulkForm" class="row-cb" type="checkbox" name="selected_ids" value="{{ req.pk }}"></td>
+          <td data-label="Row">{{ page_obj.start_index|add:forloop.counter0 }}</td>
+          <td data-label="Reference"><span class="code-pill">{{ req.reference_code }}</span></td>
+          <td data-label="Full Name"><strong>{{ req.full_name }}</strong></td>
+          <td data-label="Department">{{ req.department }}</td>
+          <td data-label="Email">{{ req.email }}</td>
+          <td data-label="Document">{% if req.uploaded_file %}<a href="{% url 'serve_uploaded_file' req.uploaded_file.name|cut:'uploads/' %}" target="_blank">View</a>{% else %}-{% endif %}</td>
+          <td data-label="Submitted">{{ req.submitted_at|date:"d M Y" }}<br><span class="muted" style="font-size:12px">{{ req.submitted_at|date:"H:i" }}</span></td>
+          <td data-label="Days Open">
             {% if req.processed %}
-              <span class="badge processed"><span class="badge-dot"></span>Processed</span>
+              <span class="badge badge--done">Done</span>
             {% else %}
-              <span class="badge pending"><span class="badge-dot"></span>Pending</span>
+              {% if req.days_open >= 3 %}<span class="badge" style="background:#fff2f1;border:1px solid #efb6b0;color:var(--danger)">{{ req.days_open }}d</span>
+              {% elif req.days_open >= 1 %}<span class="badge badge--pending">{{ req.days_open }}d</span>
+              {% else %}<span class="badge badge--done">Today</span>{% endif %}
             {% endif %}
           </td>
-          <td>
-            <div class="actions">
-              <a href="/staff/request/{{ req.reference_code }}/" class="btn-view">View</a>
+          <td data-label="Status">{% if req.processed %}<span class="badge badge--done">Processed</span>{% else %}<span class="badge badge--pending">Pending</span>{% endif %}</td>
+          <td data-label="Actions">
+            <div class="inline-actions">
+              <a href="/staff/request/{{ req.reference_code }}/">View</a>
               {% if not req.processed %}
-              <a href="{% url 'process_request' req.pk %}" class="btn-process"
-                 onclick="return confirm('Mark {{ req.full_name }}\'s request as processed?')">Process</a>
+                <a class="is-process" href="{% url 'process_request' req.pk %}" onclick="return confirm('Mark this request as processed?')">Process</a>
               {% endif %}
+              <a class="is-delete" href="{% url 'delete_request' req.pk %}">Delete</a>
             </div>
           </td>
         </tr>
         {% empty %}
-        <tr><td colspan="9"><div class="empty-state"><span class="ei">📭</span>No requests yet.</div></td></tr>
+        <tr><td colspan="11" data-label="Info">No requests found.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-</div>
 
-</main>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="pagination">
+    <div>Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</div>
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+      {% if page_obj.has_previous %}
+        <a href="?{{ filter_qs }}&page=1">First</a>
+        <a href="?{{ filter_qs }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% else %}
+        <span class="is-off">First</span>
+        <span class="is-off">Prev</span>
+      {% endif %}
 
-<footer>© 2026 Ministry of Finance, Republic of Sierra Leone — IFMIS Admin Portal</footer>
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="is-current">{{ num }}</span>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?{{ filter_qs }}&page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
 
+      {% if page_obj.has_next %}
+        <a href="?{{ filter_qs }}&page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?{{ filter_qs }}&page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% else %}
+        <span class="is-off">Next</span>
+        <span class="is-off">Last</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-function filter(s,btn){
-  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('#tbl tbody tr[data-s]').forEach(r=>{
-    r.style.display=(s==='all'||r.dataset.s===s)?'':'none';
-  });
+function countStats() {
+  const rows = [...document.querySelectorAll('#tbl tbody tr[data-status]')];
+  const pending = rows.filter(r => r.dataset.status === 'pending').length;
+  const done = rows.filter(r => r.dataset.status === 'processed').length;
+  document.getElementById('sPending').textContent = pending;
+  document.getElementById('sDone').textContent = done;
 }
-document.addEventListener('DOMContentLoaded',()=>{
-  const rows=[...document.querySelectorAll('#tbl tbody tr[data-s]')];
-  const p=rows.filter(r=>r.dataset.s==='pending').length;
-  const d=rows.filter(r=>r.dataset.s==='processed').length;
-  document.getElementById('sTotal').textContent=rows.length;
-  document.getElementById('sPending').textContent=p;
-  document.getElementById('sDone').textContent=d;
+countStats();
+
+function filterRows(status, btn) {
+  document.querySelectorAll('.status-tabs button').forEach(b => {
+    b.classList.remove('is-active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  btn.classList.add('is-active');
+  btn.setAttribute('aria-selected', 'true');
+
+  document.querySelectorAll('#tbl tbody tr[data-status]').forEach(r => {
+    r.style.display = (status === 'all' || r.dataset.status === status) ? '' : 'none';
+  });
+  clearSelection();
+}
+
+const selectAll = document.getElementById('selectAll');
+const bulkBar = document.getElementById('bulkBar');
+const bulkCount = document.getElementById('bulkCount');
+
+function updateBulk() {
+  const checked = [...document.querySelectorAll('.row-cb:checked')];
+  bulkBar.classList.toggle('is-visible', checked.length > 0);
+  bulkCount.textContent = checked.length + ' selected';
+
+  document.querySelectorAll('#tbl tbody tr').forEach(r => r.classList.remove('is-selected'));
+  checked.forEach(cb => cb.closest('tr').classList.add('is-selected'));
+}
+
+selectAll.addEventListener('change', () => {
+  document.querySelectorAll('.row-cb').forEach(cb => {
+    const row = cb.closest('tr');
+    if (row.style.display !== 'none') {
+      cb.checked = selectAll.checked;
+    }
+  });
+  updateBulk();
 });
+
+document.querySelectorAll('.row-cb').forEach(cb => cb.addEventListener('change', updateBulk));
+
+function clearSelection() {
+  document.querySelectorAll('.row-cb').forEach(cb => cb.checked = false);
+  selectAll.checked = false;
+  updateBulk();
+}
+
+function confirmBulk() {
+  const n = document.querySelectorAll('.row-cb:checked').length;
+  if (n === 0) {
+    return false;
+  }
+  return confirm('Delete ' + n + ' selected request(s)?');
+}
 </script>
-</body>
-</html>
+{% endblock %}

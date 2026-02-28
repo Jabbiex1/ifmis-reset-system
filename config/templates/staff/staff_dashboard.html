@@ -1,2 +1,23 @@
-<h1>IFMIS Admin Dashboard</h1>
-<p>You are logged in as IFMIS Admin</p>
+{% extends 'base_staff.html' %}
+
+{% block title %}IFMIS Admin{% endblock %}
+
+{% block hero %}
+<section class="shell hero-wrap">
+  <div class="hero-block">
+    <h1 class="hero-block__title">IFMIS Admin</h1>
+    <p class="hero-block__lead">This compatibility page redirects your workflow to the active dashboard and audit interfaces.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="panel section" style="max-width:680px;margin:0 auto" aria-label="Compatibility links">
+  <h2 class="section-title">Choose destination</h2>
+  <p class="muted">Use the primary admin pages below.</p>
+  <div class="action-row">
+    <a class="btn btn--primary" href="/staff/dashboard/">Open Dashboard</a>
+    <a class="btn btn--ghost" href="/staff/audit/">Open Audit Log</a>
+  </div>
+</section>
+{% endblock %}

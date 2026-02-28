@@ -1,0 +1,119 @@
+{% extends 'base_staff.html' %}
+
+{% block title %}IFMIS Admin | Audit Log{% endblock %}
+
+{% block hero %}
+<section class="shell hero-wrap">
+  <div class="hero-block">
+    <h1 class="hero-block__title">Audit Log</h1>
+    <p class="hero-block__lead">Immutable record of admin activity. Total entries: {{ total_count }}.</p>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="panel" style="margin-bottom:12px">
+  <div class="toolbar">
+    <form method="get" action="/staff/audit/" class="filters-grid filters-grid--audit" aria-label="Filter audit logs">
+      <div>
+        <label class="label-small" for="admin">Admin Username</label>
+        <input id="admin" class="control" type="text" name="admin" value="{{ admin_filter }}" placeholder="username">
+      </div>
+      <div>
+        <label class="label-small" for="ref">Reference Code</label>
+        <input id="ref" class="control" type="text" name="ref" value="{{ ref_filter }}" placeholder="ABC123XYZ789" style="text-transform:uppercase;letter-spacing:.08em">
+      </div>
+      <div>
+        <label class="label-small" for="action">Action</label>
+        <select id="action" class="control" name="action">
+          <option value="">All actions</option>
+          {% for value, label in action_choices %}
+            <option value="{{ value }}" {% if action_filter == value %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="label-small" for="date">Date</label>
+        <input id="date" class="control" type="date" name="date" value="{{ date_filter }}">
+      </div>
+      <button class="btn btn--primary" type="submit">Apply</button>
+    </form>
+
+    {% if admin_filter or action_filter or ref_filter or date_filter %}
+      <div class="filter-meta">Filters active. <a href="/staff/audit/">Clear all</a></div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="panel">
+  <div class="table-shell">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Timestamp</th>
+          <th scope="col">Admin</th>
+          <th scope="col">Action</th>
+          <th scope="col">Reference</th>
+          <th scope="col">Details</th>
+          <th scope="col">IP Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td data-label="Timestamp">{{ log.timestamp|date:"d M Y" }}<br><span class="muted" style="font-size:12px">{{ log.timestamp|date:"H:i:s" }}</span></td>
+          <td data-label="Admin">{{ log.admin.username|default:"-" }}</td>
+          <td data-label="Action">
+            {% if log.action == 'LOGIN' %}<span class="badge badge--done">Login</span>
+            {% elif log.action == 'LOGOUT' %}<span class="badge">Logout</span>
+            {% elif log.action == 'VIEW_REQUEST' %}<span class="badge">Viewed</span>
+            {% elif log.action == 'MARK_PROCESSED' %}<span class="badge badge--done">Processed</span>
+            {% elif log.action == 'MARK_PENDING' %}<span class="badge badge--pending">Reverted</span>
+            {% elif log.action == 'SEND_REPLY' %}<span class="badge" style="background:#fff5e8;border:1px solid #f2d2ad;color:#8d4f11">Reply</span>
+            {% elif log.action == 'DELETE_REQUEST' %}<span class="badge" style="background:#fff2f1;border:1px solid #efb6b0;color:var(--danger)">Deleted</span>
+            {% elif log.action == 'BULK_DELETE' %}<span class="badge" style="background:#fff2f1;border:1px solid #efb6b0;color:var(--danger)">Bulk Delete</span>
+            {% else %}<span class="badge">{{ log.action }}</span>{% endif %}
+          </td>
+          <td data-label="Reference">{% if log.ref_code %}<span class="code-pill">{{ log.ref_code }}</span>{% else %}<span class="muted">-</span>{% endif %}</td>
+          <td data-label="Details">{% if log.detail %}{{ log.detail }}{% else %}<span class="muted">-</span>{% endif %}</td>
+          <td data-label="IP Address" style="font-family:'IBM Plex Mono',monospace">{{ log.ip_address|default:"-" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" data-label="Info">No audit entries found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="pagination">
+    <div>Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }}</div>
+    <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap">
+      {% if page_obj.has_previous %}
+        <a href="?{{ filter_qs }}&page=1">First</a>
+        <a href="?{{ filter_qs }}&page={{ page_obj.previous_page_number }}">Prev</a>
+      {% else %}
+        <span class="is-off">First</span>
+        <span class="is-off">Prev</span>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+          <span class="is-current">{{ num }}</span>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <a href="?{{ filter_qs }}&page={{ num }}">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page_obj.has_next %}
+        <a href="?{{ filter_qs }}&page={{ page_obj.next_page_number }}">Next</a>
+        <a href="?{{ filter_qs }}&page={{ page_obj.paginator.num_pages }}">Last</a>
+      {% else %}
+        <span class="is-off">Next</span>
+        <span class="is-off">Last</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,288 +1,110 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Request {{ request_obj.reference_code }} — IFMIS Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#0f1f3d;--navy-mid:#1a3260;--navy-light:#2a4a8a;--navy-pale:#eef2fa;
-  --accent:#3b82f6;--accent-dark:#2563eb;
-  --white:#ffffff;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
-  --gray-400:#94a3b8;--gray-600:#475569;--gray-800:#1e293b;
-  --success:#16a34a;--radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
-}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh;display:flex;flex-direction:column;font-size:15px}
+{% extends 'base_staff.html' %}
 
-.header{background:var(--navy);padding:0 24px}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.crest{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
-.header-text .org{font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px}
-.header-text .title{font-size:1rem;font-weight:700;color:#fff}
-.header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.admin-pill{background:rgba(59,130,246,.2);color:#93c5fd;font-size:.72rem;font-weight:600;padding:4px 10px;border-radius:20px}
-.btn-logout{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-family:'Plus Jakarta Sans',sans-serif;font-size:.78rem;padding:6px 14px;border-radius:6px;cursor:pointer;text-decoration:none;transition:.15s}
-.btn-logout:hover{background:rgba(255,255,255,.08);color:#fff}
+{% block title %}IFMIS Admin | Request {{ request_obj.reference_code }}{% endblock %}
 
-nav{background:var(--navy-mid);padding:0 24px}
-.nav-inner{max-width:1200px;margin:0 auto;display:flex}
-nav a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.82rem;font-weight:500;padding:10px 16px;border-bottom:2px solid transparent;transition:.15s}
-nav a:hover{color:#fff}
-nav a.active{color:#fff;border-bottom-color:var(--accent)}
-
-main{flex:1;max-width:1200px;margin:0 auto;width:100%;padding:28px 24px 60px}
-
-.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--gray-400);text-decoration:none;font-size:.82rem;font-weight:500;margin-bottom:18px;transition:.15s}
-.back-link:hover{color:var(--navy)}
-
-.page-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;flex-wrap:wrap}
-.page-top h1{font-size:1.3rem;font-weight:700;color:var(--navy)}
-.page-top .ref{font-family:'Courier New',monospace;font-size:.85rem;color:var(--gray-400);letter-spacing:1.5px;margin-top:4px}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:.74rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.badge-dot{width:6px;height:6px;border-radius:50%}
-.badge.pending{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
-.badge.pending .badge-dot{background:#f59e0b}
-.badge.processed{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
-.badge.processed .badge-dot{background:#22c55e}
-
-/* Flash */
-.flash{background:#fff;border:1px solid var(--gray-200);border-left:3px solid var(--accent);border-radius:6px;padding:11px 16px;font-size:.84rem;color:var(--navy);margin-bottom:20px}
-
-/* LAYOUT */
-.layout{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:start}
-
-/* CARD */
-.card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
-.card:last-child{margin-bottom:0}
-.card-head{padding:12px 18px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gray-600)}
-.card-body{padding:18px}
-
-/* Info rows */
-.info-rows{display:flex;flex-direction:column;gap:12px}
-.info-item{}
-.info-label{font-size:.68rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:3px}
-.info-value{font-size:.88rem;color:var(--gray-800);font-weight:500}
-.divider{height:1px;background:var(--gray-100)}
-.ref-chip{font-family:'Courier New',monospace;font-size:.82rem;font-weight:700;letter-spacing:2px;color:var(--navy);background:var(--navy-pale);padding:3px 8px;border-radius:4px}
-
-/* File */
-.file-link{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:6px;text-decoration:none;color:var(--navy);font-size:.84rem;font-weight:600;transition:.15s}
-.file-link:hover{background:var(--navy-pale);border-color:var(--accent)}
-
-/* Action buttons */
-.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:10px;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;border:none;transition:.15s}
-.btn-success{background:var(--navy);color:#fff}.btn-success:hover{background:var(--navy-mid)}
-.btn-revert{background:var(--gray-100);color:var(--gray-600);border:1px solid var(--gray-200)}.btn-revert:hover{background:var(--gray-200)}
-
-/* CHAT */
-.chat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
-.chat-head{background:var(--navy);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
-.chat-head h2{font-size:.92rem;font-weight:700;color:#fff}
-.chat-head .count{font-size:.74rem;color:rgba(255,255,255,.4)}
-.chat-messages{padding:20px;display:flex;flex-direction:column;gap:14px;min-height:280px;max-height:420px;overflow-y:auto}
-.chat-messages::-webkit-scrollbar{width:4px}
-.chat-messages::-webkit-scrollbar-track{background:var(--gray-50)}
-.chat-messages::-webkit-scrollbar-thumb{background:var(--gray-200);border-radius:2px}
-.chat-empty{text-align:center;color:var(--gray-400);font-size:.84rem;padding:40px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
-.chat-empty .ei{font-size:2rem;opacity:.25}
-.msg{display:flex;flex-direction:column}
-.msg.user{align-items:flex-start}
-.msg.admin{align-items:flex-end}
-.msg-meta{font-size:.68rem;color:var(--gray-400);margin-bottom:4px;display:flex;align-items:center;gap:5px}
-.msg.admin .msg-meta{flex-direction:row-reverse}
-.msg-who{font-weight:700;font-size:.68rem;text-transform:uppercase;letter-spacing:.04em}
-.msg.user .msg-who{color:var(--gray-600)}
-.msg.admin .msg-who{color:var(--accent)}
-.bubble{max-width:76%;padding:10px 14px;font-size:.86rem;line-height:1.6;word-break:break-word}
-.msg.user .bubble{background:var(--gray-100);border:1px solid var(--gray-200);border-radius:4px 12px 12px 4px}
-.msg.admin .bubble{background:var(--navy);color:#fff;border-radius:12px 4px 4px 12px}
-
-.reply-area{border-top:1px solid var(--gray-100);padding:16px 20px;background:var(--gray-50)}
-.reply-label{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-400);margin-bottom:8px}
-.reply-area textarea{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.86rem;color:var(--gray-800);background:#fff;resize:vertical;min-height:76px;outline:none;transition:.15s}
-.reply-area textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
-.reply-footer{display:flex;justify-content:flex-end;margin-top:8px}
-.btn-send{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;transition:.15s}
-.btn-send:hover{background:var(--accent-dark)}
-
-footer{background:var(--navy);color:rgba(255,255,255,.35);font-size:.72rem;text-align:center;padding:14px}
-
-@media(max-width:860px){.layout{grid-template-columns:1fr}.chat-messages{max-height:320px}}
-@media(max-width:480px){main{padding:20px 16px 48px}.header-right .admin-pill{display:none}}
-</style>
-</head>
-<body>
-
-<div class="header">
-  <div class="header-inner">
-    <div class="crest">🇸🇱</div>
-    <div class="header-text">
-      <div class="org">Ministry of Finance · Sierra Leone</div>
-      <div class="title">IFMIS Help Desk — Admin Portal</div>
-    </div>
-    <div class="header-right">
-      <span class="admin-pill">IFMIS Admin</span>
-      <a href="/staff/logout/" class="btn-logout">Sign Out</a>
-    </div>
+{% block hero %}
+<section class="shell hero-wrap">
+  <div class="hero-block">
+    <h1 class="hero-block__title">Request Detail</h1>
+    <p class="hero-block__lead">Reference {{ request_obj.reference_code }}. Review request data, documents, and conversation history.</p>
   </div>
-</div>
+</section>
+{% endblock %}
 
-<nav>
-  <div class="nav-inner">
-    <a href="/staff/dashboard/" class="active">Dashboard</a>
-    <a href="/">Public Portal</a>
-  </div>
-</nav>
-
-<main>
-
-{% if messages %}
-  {% for message in messages %}
-  <div class="flash">✅ {{ message }}</div>
-  {% endfor %}
-{% endif %}
-
-<a href="/staff/dashboard/" class="back-link">← Back to Dashboard</a>
-
-<div class="page-top">
-  <div>
-    <h1>Request Detail</h1>
-    <div class="ref">REF: {{ request_obj.reference_code }}</div>
-  </div>
-  {% if request_obj.processed %}
-    <span class="badge processed"><span class="badge-dot"></span>Processed</span>
-  {% else %}
-    <span class="badge pending"><span class="badge-dot"></span>Pending Review</span>
+{% block content %}
+<div class="flash-stack" aria-live="polite">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="flash" role="status">{{ message }}</div>
+    {% endfor %}
   {% endif %}
 </div>
 
-<div class="layout">
-
-  <!-- Left -->
-  <div>
-
-    <div class="card">
-      <div class="card-head">Requestor Info</div>
-      <div class="card-body">
-        <div class="info-rows">
-          <div class="info-item">
-            <div class="info-label">Full Name</div>
-            <div class="info-value">{{ request_obj.full_name }}</div>
-          </div>
-          <div class="divider"></div>
-          <div class="info-item">
-            <div class="info-label">Department</div>
-            <div class="info-value">{{ request_obj.department }}</div>
-          </div>
-          <div class="divider"></div>
-          <div class="info-item">
-            <div class="info-label">Email</div>
-            <div class="info-value">{{ request_obj.email }}</div>
-          </div>
-          <div class="divider"></div>
-          <div class="info-item">
-            <div class="info-label">Submitted</div>
-            <div class="info-value">{{ request_obj.submitted_at|date:"d M Y, H:i" }}</div>
-          </div>
-          <div class="divider"></div>
-          <div class="info-item">
-            <div class="info-label">Reference</div>
-            <div class="info-value"><span class="ref-chip">{{ request_obj.reference_code }}</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">Uploaded Document</div>
-      <div class="card-body">
-        {% if request_obj.uploaded_file %}
-          <a href="{{ request_obj.uploaded_file.url }}" target="_blank" class="file-link">
-            📄 View / Download Document
-          </a>
-        {% else %}
-          <p style="font-size:.82rem;color:var(--gray-400)">No document uploaded.</p>
-        {% endif %}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-head">Actions</div>
-      <div class="card-body">
-        {% if not request_obj.processed %}
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="mark_processed"/>
-          <button type="submit" class="btn btn-success"
-                  onclick="return confirm('Mark this request as processed?')">
-            ✅ Mark as Processed
-          </button>
-        </form>
-        {% else %}
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="mark_pending"/>
-          <button type="submit" class="btn btn-revert">↩ Revert to Pending</button>
-        </form>
-        {% endif %}
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Right: Chat -->
-  <div>
-    <div class="chat-card">
-      <div class="chat-head">
-        <h2>💬 Conversation</h2>
-        <span class="count">{{ chat_messages|length }} message{{ chat_messages|length|pluralize }}</span>
-      </div>
-
-      <div class="chat-messages" id="chatBox">
-        {% for msg in chat_messages %}
-        <div class="msg {{ msg.sender }}">
-          <div class="msg-meta">
-            <span class="msg-who">{% if msg.sender == 'admin' %}You (Admin){% else %}{{ request_obj.full_name }}{% endif %}</span>
-            <span>·</span>
-            <span>{{ msg.timestamp|date:"d M, H:i" }}</span>
-          </div>
-          <div class="bubble">{{ msg.content }}</div>
-        </div>
-        {% empty %}
-        <div class="chat-empty">
-          <div class="ei">💬</div>
-          <div>No messages yet</div>
-          <div style="font-size:.76rem">Use the form below to reply to the requestor</div>
-        </div>
-        {% endfor %}
-      </div>
-
-      <div class="reply-area">
-        <div class="reply-label">Send a Reply</div>
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="action" value="reply"/>
-          <textarea name="content" placeholder="Type your reply to the requestor..." required></textarea>
-          <div class="reply-footer">
-            <button type="submit" class="btn-send">Send Reply →</button>
-          </div>
-        </form>
-      </div>
-
-    </div>
-  </div>
-
+<div class="action-row" style="margin-bottom:10px">
+  <a class="btn btn--ghost" href="/staff/dashboard/">Back to dashboard</a>
+  {% if request_obj.processed %}<span class="badge badge--done">Processed</span>{% else %}<span class="badge badge--pending">Pending</span>{% endif %}
 </div>
-</main>
 
-<footer>© 2026 Ministry of Finance, Republic of Sierra Leone — IFMIS Admin Portal</footer>
+<section class="request-grid">
+  <aside>
+    <article class="panel section" aria-label="Requestor details" style="margin-bottom:12px">
+      <h2 class="section-title" style="font-size:18px">Requestor</h2>
+      <div class="card-row"><div class="card-key">Full Name</div><div class="card-value">{{ request_obj.full_name }}</div></div>
+      <div class="card-row"><div class="card-key">Department</div><div class="card-value">{{ request_obj.department }}</div></div>
+      <div class="card-row"><div class="card-key">Email</div><div class="card-value">{{ request_obj.email }}</div></div>
+      <div class="card-row"><div class="card-key">Submitted</div><div class="card-value">{{ request_obj.submitted_at|date:"d M Y, H:i" }}</div></div>
+      <div class="card-row"><div class="card-key">Reference</div><div class="card-value"><span class="code-pill">{{ request_obj.reference_code }}</span></div></div>
+    </article>
 
+    <article class="panel section" aria-label="Uploaded document" style="margin-bottom:12px">
+      <h2 class="section-title" style="font-size:18px">Uploaded Document</h2>
+      {% if request_obj.uploaded_file %}
+        <div class="action-row">
+          <a class="btn btn--ghost" href="{% url 'serve_uploaded_file' request_obj.uploaded_file.name|cut:'uploads/' %}" target="_blank">View document</a>
+          <a class="btn btn--ghost" href="{% url 'serve_uploaded_file' request_obj.uploaded_file.name|cut:'uploads/' %}?download=1">Download document</a>
+        </div>
+      {% else %}
+        <p class="muted">No uploaded document.</p>
+      {% endif %}
+    </article>
+
+    <article class="panel section" aria-label="Request actions">
+      <h2 class="section-title" style="font-size:18px">Actions</h2>
+      <div class="action-row">
+        {% if not request_obj.processed %}
+          <form method="post" style="width:100%">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="mark_processed">
+            <button class="btn btn--primary" style="width:100%" type="submit" onclick="return confirm('Mark this request as processed?')">Mark as Processed</button>
+          </form>
+        {% else %}
+          <form method="post" style="width:100%">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="mark_pending">
+            <button class="btn btn--ghost" style="width:100%" type="submit">Revert to Pending</button>
+          </form>
+        {% endif %}
+        <a class="btn btn--danger" style="width:100%" href="{% url 'delete_request' request_obj.pk %}">Delete Request</a>
+      </div>
+    </article>
+  </aside>
+
+  <article class="panel chat-shell" aria-label="Conversation">
+    <div class="chat-head">
+      <strong>Conversation</strong>
+      <span class="muted">{{ chat_messages|length }} message{{ chat_messages|length|pluralize }}</span>
+    </div>
+    <div class="chat-body" id="chatBox">
+      {% for msg in chat_messages %}
+        <div class="chat-msg {% if msg.sender == 'admin' %}chat-msg--admin{% else %}chat-msg--user{% endif %}">
+          <div class="chat-meta">{% if msg.sender == 'admin' %}You{% else %}{{ request_obj.full_name }}{% endif %} | {{ msg.timestamp|date:"d M, H:i" }}</div>
+          <div class="chat-bubble">{{ msg.content }}</div>
+        </div>
+      {% empty %}
+        <div class="chat-empty">No messages yet.</div>
+      {% endfor %}
+    </div>
+
+    <div class="chat-reply">
+      <form method="post" aria-label="Reply to requestor">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reply">
+        <label for="admin-reply" class="card-key" style="display:block;margin-bottom:6px">Reply</label>
+        <textarea id="admin-reply" class="control" name="content" placeholder="Reply to requestor" required></textarea>
+        <div class="action-row" style="margin-top:8px;justify-content:flex-end">
+          <button class="btn btn--primary" type="submit">Send Reply</button>
+        </div>
+      </form>
+    </div>
+  </article>
+</section>
+{% endblock %}
+
+{% block extra_js %}
 <script>
-const b=document.getElementById('chatBox');
-if(b) b.scrollTop=b.scrollHeight;
+const box = document.getElementById('chatBox');
+if (box) {
+  box.scrollTop = box.scrollHeight;
+}
 </script>
-</body>
-</html>
+{% endblock %}

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!#0(7_wiw7k2(q(on3gkrn3i*s@zhcs^vyr1+2b5kzw9my1d$+'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-dev-only-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'True').strip().lower() in ('1', 'true', 'yes', 'on')
 
-ALLOWED_HOSTS = ['10.27.10.122']
+ALLOWED_HOSTS = [
+    host.strip() for host in os.getenv(
+        'DJANGO_ALLOWED_HOSTS',
+        '10.27.10.122,127.0.0.1,192.168.100.162'
+    ).split(',') if host.strip()
+]
 
 
 # Application definition
@@ -37,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'core',
+    'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [
@@ -124,3 +130,33 @@ LOGOUT_REDIRECT_URL = '/staff/login/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+# ─────────────────────────────────────────────────────────────────
+# ADD THESE TO YOUR EXISTING settings.py
+# ─────────────────────────────────────────────────────────────────
+
+# #1 — Rate limiting uses Django's cache. Default LocMemCache works
+# in development. For production switch to RedisCache or DatabaseCache.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
+# #2 — Remove Django's automatic media file serving so files go
+# through your protected view instead. (Remove the static() line
+# from urls.py for MEDIA — it's handled by the new URL pattern.)
+
+# #5 — Email configuration
+EMAIL_BACKEND = os.getenv('DJANGO_EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('DJANGO_EMAIL_HOST', '')
+EMAIL_PORT = int(os.getenv('DJANGO_EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('DJANGO_EMAIL_USE_TLS', 'True').strip().lower() in ('1', 'true', 'yes', 'on')
+EMAIL_HOST_USER = os.getenv('DJANGO_EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('DJANGO_EMAIL_HOST_PASSWORD', '')
+
+DEFAULT_FROM_EMAIL = os.getenv('DJANGO_DEFAULT_FROM_EMAIL', 'IFMIS Help Desk <noreply@mof.gov.sl>')
+
+# Used in email links so users can click through to the right URL
+SITE_URL = os.getenv('DJANGO_SITE_URL', 'http://127.0.0.1:8000')
+
+LOGOUT_REDIRECT_URL = '/staff/login/'

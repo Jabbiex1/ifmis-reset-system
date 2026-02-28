@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}IFMIS Help Desk{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="theme-public">
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<header class="site-header" role="banner">
+  <div class="shell site-header__row">
+    <a href="/" class="brand" aria-label="IFMIS Help Desk Home">
+      <span class="brand__mark" aria-hidden="true">IF</span>
+      <span class="brand__meta">
+        <small>Ministry of Finance</small>
+        <strong>IFMIS Help Desk</strong>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      <a href="/" class="site-nav__link {% if request.path == '/' %}is-active{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %}>Submit Request</a>
+      <a href="/track/" class="site-nav__link {% if request.path == '/track/' %}is-active{% endif %}" {% if request.path == '/track/' %}aria-current="page"{% endif %}>Track Request</a>
+      <a href="/staff/login/" class="site-nav__link {% if request.path == '/staff/login/' %}is-active{% endif %}" {% if request.path == '/staff/login/' %}aria-current="page"{% endif %}>Staff Login</a>
+    </nav>
+  </div>
+</header>
+
+{% block hero %}{% endblock %}
+
+<main id="main-content" class="shell main-content page-enter" tabindex="-1">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="shell site-footer">
+  {% block footer %}Copyright 2026 Ministry of Finance, Republic of Sierra Leone{% endblock %}
+</footer>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
